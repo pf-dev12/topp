@@ -49,7 +49,7 @@ export default function Settings() {
           <View style={styles.infoCard}>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Email:</Text>
-              <Text style={styles.infoValue}>{user?.email}</Text>
+              <Text style={styles.infoValue}>{branch?.email}</Text>
             </View>
             
             <View style={styles.infoRow}>
@@ -58,8 +58,8 @@ export default function Settings() {
             </View>
             
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>User ID:</Text>
-              <Text style={styles.infoValue}>{user?.id}</Text>
+              <Text style={styles.infoLabel}>Branch ID:</Text>
+              <Text style={styles.infoValue}>{branch?.id}</Text>
             </View>
           </View>
         </View>

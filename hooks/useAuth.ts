@@ -47,13 +47,14 @@ export function useAuth() {
 
   const fetchUserBranch = async (userId: string) => {
     try {
-      const { data: branchUser, error } = await supabase
-        .from('branch_users')
+      const { data: branchSession, error } = await supabase
+        .from('branch_sessions')
         .select(`
           branch_id,
           branches (
             id,
             name,
+            email,
             created_at
           )
         `)
@@ -61,28 +62,85 @@ export function useAuth() {
         .single()
 
       if (error) {
-        console.error('Error fetching user branch:', error)
+        console.error('Error fetching branch session:', error)
         setAuthState(prev => ({ ...prev, loading: false }))
         return
       }
 
       setAuthState(prev => ({
         ...prev,
-        branch: branchUser.branches as Branch,
+        branch: branchSession.branches as Branch,
         loading: false
       }))
     } catch (error) {
-      console.error('Error fetching user branch:', error)
+      console.error('Error fetching branch session:', error)
       setAuthState(prev => ({ ...prev, loading: false }))
     }
   }
 
-  const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    return { data, error }
+  const signInWithBranch = async (branchEmail: string, branchPassword: string) => {
+    try {
+      // First, verify branch credentials
+      const { data: branch, error: branchError } = await supabase
+        .from('branches')
+        .select('*')
+        .eq('email', branchEmail)
+        .single()
+
+      if (branchError || !branch) {
+        return { data: null, error: { message: 'Invalid branch credentials' } }
+      }
+
+      // For demo purposes, we'll use a simple password check
+      // In production, you'd want proper password hashing
+      if (branchPassword !== 'peshawar2024') {
+        return { data: null, error: { message: 'Invalid branch credentials' } }
+      }
+
+      // Create or get a user for this branch
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: branchEmail,
+        password: 'defaultpassword123', // Default password for all branch users
+      })
+
+      if (authError) {
+        // If user doesn't exist, create one
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: branchEmail,
+          password: 'defaultpassword123',
+        })
+
+        if (signUpError) {
+          return { data: null, error: signUpError }
+        }
+
+        if (signUpData.user) {
+          // Create branch session
+          await supabase
+            .from('branch_sessions')
+            .upsert({
+              user_id: signUpData.user.id,
+              branch_id: branch.id
+            })
+        }
+
+        return { data: signUpData, error: null }
+      }
+
+      if (authData.user) {
+        // Create or update branch session
+        await supabase
+          .from('branch_sessions')
+          .upsert({
+            user_id: authData.user.id,
+            branch_id: branch.id
+          })
+      }
+
+      return { data: authData, error: null }
+    } catch (error) {
+      return { data: null, error: { message: 'Authentication failed' } }
+    }
   }
 
   const signOut = async () => {
@@ -92,7 +150,7 @@ export function useAuth() {
 
   return {
     ...authState,
-    signIn,
+    signInWithBranch,
     signOut,
   }
 }

@@ -2,7 +2,7 @@ import React, { createContext, useContext } from 'react'
 import { AuthState, useAuth } from '@/hooks/useAuth'
 
 interface AuthContextType extends AuthState {
-  signIn: (email: string, password: string) => Promise<any>
+  signInWithBranch: (branchEmail: string, branchPassword: string) => Promise<any>
   signOut: () => Promise<any>
 }
 

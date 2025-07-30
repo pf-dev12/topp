@@ -18,20 +18,26 @@ export type Database = {
         Row: {
           id: string
           name: string
+          email: string
+          password_hash: string
           created_at: string
         }
         Insert: {
           id?: string
           name: string
+          email: string
+          password_hash: string
           created_at?: string
         }
         Update: {
           id?: string
           name?: string
+          email?: string
+          password_hash?: string
           created_at?: string
         }
       }
-      branch_users: {
+      branch_sessions: {
         Row: {
           id: string
           branch_id: string

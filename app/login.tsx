@@ -14,20 +14,20 @@ import { router } from 'expo-router'
 import { useAuthContext } from '@/contexts/AuthContext'
 
 export default function Login() {
-  const [email, setEmail] = useState('')
+  const [branchEmail, setBranchEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const { signIn } = useAuthContext()
+  const { signInWithBranch } = useAuthContext()
 
   const handleLogin = async () => {
-    if (!email || !password) {
+    if (!branchEmail || !password) {
       Alert.alert('Error', 'Please fill in all fields')
       return
     }
 
     setLoading(true)
     try {
-      const { error } = await signIn(email, password)
+      const { error } = await signInWithBranch(branchEmail, password)
       if (error) {
         Alert.alert('Login Failed', error.message)
       } else {
@@ -47,27 +47,27 @@ export default function Login() {
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>Taste of Peshawar</Text>
-          <Text style={styles.subtitle}>Staff Login</Text>
+          <Text style={styles.subtitle}>Branch Login</Text>
         </View>
 
         <View style={styles.form}>
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>Branch Email</Text>
           <TextInput
             style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Enter your email"
+            value={branchEmail}
+            onChangeText={setBranchEmail}
+            placeholder="Enter branch email"
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
           />
 
-          <Text style={styles.label}>Password</Text>
+          <Text style={styles.label}>Branch Password</Text>
           <TextInput
             style={styles.input}
             value={password}
             onChangeText={setPassword}
-            placeholder="Enter your password"
+            placeholder="Enter branch password"
             secureTextEntry
             autoCapitalize="none"
             autoCorrect={false}
@@ -86,7 +86,14 @@ export default function Login() {
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Contact your manager for login credentials
+            Use your branch credentials to access the system
+          </Text>
+          <View style={styles.credentialsInfo}>
+            <Text style={styles.credentialsTitle}>Branch Credentials:</Text>
+            <Text style={styles.credentialsText}>Cardiff: cardiff@tasteofpeshawar.com</Text>
+            <Text style={styles.credentialsText}>Wembley: wembley@tasteofpeshawar.com</Text>
+            <Text style={styles.credentialsText}>Password: peshawar2024</Text>
+          </View>
           </Text>
         </View>
       </View>
@@ -163,5 +170,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6b7280',
     textAlign: 'center',
+    marginBottom: 20,
+  },
+  credentialsInfo: {
+    backgroundColor: '#f3f4f6',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  credentialsTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  credentialsText: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginBottom: 2,
   },
 })
